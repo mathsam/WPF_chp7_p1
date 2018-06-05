@@ -41,10 +41,25 @@ namespace DrawAndMeasure
             canv.MouseLeftButtonUp += Canv_MouseUp;
             canv.MouseMove += Canv_MouseMove;
             canv.Background = new SolidColorBrush(Colors.GreenYellow);
-
             this.Content = canv;
 
             this.SizeToContent = SizeToContent.WidthAndHeight;
+
+            this.KeyDown += PaintSomething_KeyDown;
+        }
+
+        private void PaintSomething_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (this.line_selected != null)
+            {
+                if (e.Key == Key.Delete || e.Key == Key.Back)
+                {
+                    this.canv.Children.Remove(this.line_selected);
+                    this.line_selected = null;
+                }
+            }
+            e.Handled = true;
+            base.OnKeyDown(e);
         }
 
         private void Canv_MouseMove(object sender, MouseEventArgs e)
@@ -77,6 +92,7 @@ namespace DrawAndMeasure
                     {
                         this.line_selected.Stroke = new SolidColorBrush(Colors.Blue);
                         this.line_selected = null;
+                        this.canv.Focus();
                     }
 
                 }
@@ -89,6 +105,7 @@ namespace DrawAndMeasure
                         this.line_selected = l;
                         this.line_selected_startPoint.X = l.X1;
                         this.line_selected_startPoint.Y = l.Y1;
+                        this.line_selected.Focus();
                         break;
                     }
                 }
@@ -106,6 +123,7 @@ namespace DrawAndMeasure
             {
                 this.curr_line.X2 = endPoint.X;
                 this.curr_line.Y2 = endPoint.Y;
+                this.curr_line.Cursor = Cursors.Hand;
                 this.curr_line = null;
             }
             else if (this.pending_action == MouseDownAction.MoveExistingLine)
