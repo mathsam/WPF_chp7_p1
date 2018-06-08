@@ -33,23 +33,29 @@ namespace DrawAndMeasure
         public PaintSomething()
         {
             Title = "Paint";
+            Height = 500;
+            Width = 500;
 
-            this.canv = new Canvas();
-            canv.Width = 500;
-            canv.Height = 500;
+            canv = new Canvas();
             canv.MouseLeftButtonDown += Canv_MouseDown;
             canv.MouseLeftButtonUp += Canv_MouseUp;
             canv.MouseMove += Canv_MouseMove;
             canv.Background = new SolidColorBrush(Colors.GreenYellow);
-            this.Content = canv;
+            Content = canv;
 
-            this.SizeToContent = SizeToContent.WidthAndHeight;
+            canv.SetBinding(Window.HeightProperty, "Height");
+            canv.SetBinding(Window.WidthProperty, "Width");
+            canv.DataContext = this;
+            //this.SizeToContent = SizeToContent.WidthAndHeight;
+            canv.ClipToBounds = true;
 
             this.KeyDown += PaintSomething_KeyDown;
         }
 
         private void PaintSomething_KeyDown(object sender, KeyEventArgs e)
         {
+            Console.WriteLine(e.Key);
+
             if (this.line_selected != null)
             {
                 if (e.Key == Key.Delete || e.Key == Key.Back)
