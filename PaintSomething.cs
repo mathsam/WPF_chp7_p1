@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace DrawAndMeasure
+namespace DrawAndMeasure_
 {
     class PaintSomething : Window
     {
@@ -22,13 +22,6 @@ namespace DrawAndMeasure
         Line line_selected;
         Point line_selected_startPoint;
         MouseDownAction pending_action = MouseDownAction.Nothing;
-
-        [STAThread]
-        public static void Main()
-        {
-            Application app = new Application();
-            app.Run(new PaintSomething());
-        }
 
         public PaintSomething()
         {
