@@ -22,6 +22,9 @@ namespace BackEnd
 
     class CanvasCanMeasure : InkCanvas
     {
+
+        BitmapImage BackgroundImag;
+
         //total length of lines that user has drawn
         public double TotalDrawingLength {
             get => MeasureStrokesLength();
@@ -45,7 +48,7 @@ namespace BackEnd
         public CanvasCanMeasure()
         {
             Background = new SolidColorBrush(Colors.Gray);
-            IsEnabled = false;
+            //IsEnabled = false;
             ResizeEnabled = false;
             ClipToBounds = true;
             StrokeThickness = 6;
@@ -62,6 +65,39 @@ namespace BackEnd
             MeasurementDisplay.Background = Brushes.LightYellow;
             MeasurementDisplay.Padding = new Thickness(10, 5, 10, 5);
             Children.Add(MeasurementDisplay);
+
+            AllowDrop = true;
+            Drop += CanvasCanMeasure_Drop;
+        }
+
+        protected void ResetCanvas()
+        {
+            Strokes.Clear();
+            Children.Clear();
+            MeasurementDisplay.Text = "Length = 0";
+            Children.Add(MeasurementDisplay);
+        }
+
+        public void SetBackgroundImage(string FilePath)
+        {
+            ResetCanvas();
+
+            ImageBrush imgBrush = new ImageBrush();
+            BackgroundImag = new BitmapImage(new Uri(FilePath, UriKind.RelativeOrAbsolute));
+            imgBrush.ImageSource = BackgroundImag;
+            Width = imgBrush.ImageSource.Width;
+            Height = imgBrush.ImageSource.Height;
+            Background = imgBrush;
+            IsEnabled = true;
+        }
+
+        private void CanvasCanMeasure_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+                SetBackgroundImage(files[0]);
+            }
         }
 
         public double MeasureStrokesLength()
@@ -105,23 +141,16 @@ namespace BackEnd
             return length;
         }
 
-        public void SetBackgroundImage(string FilePath)
-        {
-            Strokes.Clear();
-            Children.Clear();
-            MeasurementDisplay.Text = "Length = 0";
-            Children.Add(MeasurementDisplay);
-
-            ImageBrush imgBrush = new ImageBrush();
-            imgBrush.ImageSource = new BitmapImage(new Uri(FilePath, UriKind.RelativeOrAbsolute));
-            Width = imgBrush.ImageSource.Width;
-            Height = imgBrush.ImageSource.Height;
-            Background = imgBrush;
-            IsEnabled = true;
-        }
-
         protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
         {
+            if (BackgroundImag == null)
+            {
+                e.Handled = true;
+                MessageBox.Show("Load an image to start measuring");
+                base.OnPreviewMouseLeftButtonDown(e);
+                return;
+            }
+
             if (CurrDrawMode == DrawMode.FreeScratch)
             {
                 base.OnPreviewMouseLeftButtonDown(e);
