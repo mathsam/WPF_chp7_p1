@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 
 namespace DrawAndMeasure
@@ -44,10 +35,34 @@ namespace DrawAndMeasure
             SizeToContent = SizeToContent.WidthAndHeight;
         }
 
+        void SaveCanvasToFile(object sender, RoutedEventArgs args)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "PNG file (*.png)|*.png|JPEG file (*.jpeg)|*.jpeg|Bitmap file (*.bmp)|*.bmp|TIFF file (*.tiff)|*.tiff";
+
+            if ((bool)dlg.ShowDialog(this))
+            {
+                try
+                {
+                    canv.SaveCanvas(dlg.FileName);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("Save file error {0}", e.Message);
+                }
+            }
+        }
+
         void DisplayMeasuredLength(object sender, RoutedEventArgs args)
         {
             double total_length = canv.MeasureStrokesLength();
             MessageBox.Show("total length = " + total_length);
+        }
+
+
+        private void ClearCanvDrawing(object sender, RoutedEventArgs e)
+        {
+            canv.ResetCanvas();
         }
 
         private void DrawModeSelectionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -77,9 +92,5 @@ namespace DrawAndMeasure
             canv.StrokeThickness = Double.Parse(selected);
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

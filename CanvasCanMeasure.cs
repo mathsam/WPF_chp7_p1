@@ -70,7 +70,7 @@ namespace BackEnd
             Drop += CanvasCanMeasure_Drop;
         }
 
-        protected void ResetCanvas()
+        public void ResetCanvas()
         {
             Strokes.Clear();
             Children.Clear();
@@ -97,6 +97,56 @@ namespace BackEnd
             {
                 string[] files = (string[]) e.Data.GetData(DataFormats.FileDrop);
                 SetBackgroundImage(files[0]);
+            }
+        }
+
+        public void SaveCanvas(string FilePath)
+        {
+            string ext = System.IO.Path.GetExtension(FilePath).ToLower();
+            BitmapEncoder encoder;
+            switch (ext)
+            {
+                case ".jpg":
+                    {
+                        encoder = new JpegBitmapEncoder();
+                        break;
+                    }
+                case ".jpeg":
+                    {
+                        encoder = new JpegBitmapEncoder();
+                        break;
+                    }
+                case ".bmp":
+                    {
+                        encoder = new BmpBitmapEncoder();
+                        break;
+                    }
+                case ".tif":
+                    {
+                        encoder = new TiffBitmapEncoder();
+                        break;
+                    }
+                case ".tiff":
+                    {
+                        encoder = new TiffBitmapEncoder();
+                        break;
+                    }
+                default:
+                    {
+                        encoder = new PngBitmapEncoder();
+                        if (ext != ".png") FilePath += ".png";
+                        break;
+                    }
+            }
+
+            RenderTargetBitmap bitmap = new RenderTargetBitmap((int)this.Width, (int)this.Height, 96, 96, PixelFormats.Pbgra32);
+            bitmap.Render(this);
+            BitmapFrame frame = BitmapFrame.Create(bitmap);
+            encoder.Frames.Add(frame);
+
+            using (var stream = System.IO.File.Create(FilePath))
+            {
+                encoder.Save(stream);
             }
         }
 
